@@ -61,7 +61,7 @@ parse_config() {
 
 	config_get dir "$cfg" database_directory /var/lib/nlbwmon
 
-	mkdir -p "$dir"
+#	mkdir -p "$dir"
 	procd_append_param command -o "$dir"
 
 	add_option "$cfg" -b netlink_buffer_size 524288
