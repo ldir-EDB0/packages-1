@@ -1,0 +1,45 @@
+From 4397cc98b3c608302af4621fe42ed1f094921fc6 Mon Sep 17 00:00:00 2001
+From: Kevin Darbyshire-Bryant <ldir@darbyshire-bryant.me.uk>
+Date: Wed, 22 Apr 2020 14:28:31 +0100
+Subject: [PATCH] dscp experiment
+
+Signed-off-by: Kevin Darbyshire-Bryant <ldir@darbyshire-bryant.me.uk>
+---
+ src/stub.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+--- a/src/stub.c
++++ b/src/stub.c
+@@ -52,6 +52,7 @@
+ #include "platform.h"
+ #include "general.h"
+ #include "pubkey-pinning.h"
++#include <netinet/ip.h>
+ 
+ /* WSA TODO: 
+  * STUB_TCP_RETRY added to deal with edge triggered event loops (versus
+@@ -382,6 +383,9 @@ tcp_connect(getdns_upstream *upstream, g
+ 	static const int  enable = 1;
+ # endif
+ #endif
++#if defined(IP_TOS)
++	int dscp = IPTOS_CLASS_CS2;
++#endif
+ 	int fd = -1;
+ 
+ 
+@@ -390,6 +394,14 @@ tcp_connect(getdns_upstream *upstream, g
+ 	           __FUNC__, (void*)upstream);
+ 	if ((fd = socket(upstream->addr.ss_family, SOCK_STREAM, IPPROTO_TCP)) == -1)
+ 		return -1;
++#if defined(IP_TOS)
++	if (upstream->addr.ss_family == AF_INET)
++		(void)setsockopt(fd, IPPROTO_IP, IP_TOS, &dscp, sizeof(dscp));
++#if defined(IPV6_TCLASS)
++	else if (upstream->addr.ss_family == AF_INET6)
++		(void)setsockopt(fd, IPPROTO_IPV6, IPV6_TCLASS, &dscp, sizeof(dscp));
++#endif
++#endif
+ 
+ 	getdns_sock_nonblock(fd);
+ #ifdef USE_OSX_TCP_FASTOPEN
