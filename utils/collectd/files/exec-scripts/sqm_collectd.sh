@@ -27,6 +27,8 @@ handle_cake() {
 	case "$diffserv" in
 		diffserv3 | diffserv4) tns="BKBEVIVO"
 			;;
+		diffserv5) tns="LEBKBEVIVO"
+			;;
 		*) tns="T0T1T2T3T4T5T6T7"
 			;;
 	esac
